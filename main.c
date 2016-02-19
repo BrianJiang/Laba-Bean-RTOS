@@ -41,8 +41,8 @@ _TaskStart
 		
 		LED1 = 0;
 		PA3High;
-    PA3Low;
-    PA3High;		
+                PA3Low;
+                PA3High;		
 		SetEvent(task1,tasksync);
 		WaitTime(1000,1);	
 			  
@@ -76,7 +76,7 @@ _TaskStart
 		WaitTime(250,1);
 		LED_OFF();
 		SetEvent(task3,tasksync);
-   WaitTime(750,2);	
+                WaitTime(750,2);	
 		
 	}
 _TaskEnd
@@ -113,13 +113,13 @@ int main(void)
 		
 		switch(TaskPrio++){ //change TaskPrio value can change sequence of task execution.
 			case MAXPREEMPTS: 
-         Rtask2();  
-				 break;
+                           Rtask2();  
+		           break;
 			case (MAXPREEMPTS+1): 
-         Rtask3();
-        	break;
-      default: TaskPrio=MAXPREEMPTS; // add sleep command here
-          break;
+                           Rtask3();
+        	           break;
+                        default: TaskPrio=MAXPREEMPTS; // add sleep command here
+                           break;
 		}
 		
 		;
@@ -128,10 +128,7 @@ int main(void)
 }
 
 /************************
-函数功能：总初始化
-输入参数：无
-输出参数：无
-备    注：无
+Function: Initialize
 ************************/
 void ALL_Config(void)
 {
@@ -144,6 +141,7 @@ void ALL_Config(void)
 	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR4|GPIO_OSPEEDER_OSPEEDR4; // 50MHz speed
 }
 
+/* This is RTOS ticker interrupt handler */
 void SysTick_Handler(void){
   UpdateTimers();
 }
