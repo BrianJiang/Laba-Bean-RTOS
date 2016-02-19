@@ -52,20 +52,20 @@ extern const unsigned char TaskVectorNo[], TaskPrioAssigned[];
                         }while(0)
 
 #define PreemptStart NVIC_SetPendingIRQ((IRQn_Type)TaskVectorNo[0] ); \
-										 NVIC_SetPendingIRQ((IRQn_Type)TaskVectorNo[1] )				
+		     NVIC_SetPendingIRQ((IRQn_Type)TaskVectorNo[1] )				
 
 /* need add task name in curespond vector table */
 #define Preempt(i) do{                             \
-	                   switch(i){                    \
-											 case 0: Task0IntSet; break; \
-	                     case 1: Task1IntSet; break; \
-	                     default: break;             \
+	             switch(i){                    \
+		       case 0: Task0IntSet; break; \
+	               case 1: Task1IntSet; break; \
+	               default: break;             \
                      }                             \
                    }while(0)
 /* hardware related portion ends */
 #define _TaskStart      do{static unsigned char _cpn=0,CurID,Trigged; \
-											  switch(_cpn){                              \
-													case 0:  
+			   switch(_cpn){                              \
+			        case 0:  
 #define _TaskEnd            break;                          \
                           default: if(Trigged); break;      \
                         }                                   \
@@ -74,27 +74,27 @@ extern const unsigned char TaskVectorNo[], TaskPrioAssigned[];
                      
 #define WaitTime(ticks,caseno)   _cpn=caseno;               \
                                  Wtimers[CurID] = ticks;    \
-													       case caseno:               \
+			         case caseno:               \
                                    if(Wtimers[CurID])return
 																		 
 #define WaitEventAnd(c, timeout, caseno) _cpn=caseno;                                   \
-													               Wtimers[CurID]=timeout;                        \
-													               case caseno:                                   \
-																				   if((Event[CurID]&c^c)&&Wtimers[CurID])return;\
+			                 Wtimers[CurID]=timeout;                        \
+			                 case caseno:                                   \
+					   if((Event[CurID]&c^c)&&Wtimers[CurID])return;\
                                            Trigged = !(Event[CurID]&c^c)																						 
 																				 
 #define WaitEventOr(c, timeout, caseno) _cpn=caseno;                                    \
-															          Wtimers[CurID] = timeout;                       \
-																        case caseno:                                    \
-																		      if(!(c&Event[CurID])&&Wtimers[CurID]) return; \
-																				  Trigged = c&Event[CurID]
+			                Wtimers[CurID] = timeout;                       \
+				        case caseno:                                    \
+			                  if(!(c&Event[CurID])&&Wtimers[CurID]) return; \
+					  Trigged = c&Event[CurID]
                                           						
 
 																			
 #define SetEvent(taskid,event) do{                      \
-	                               __disable_irq();       \
-	                               Event[taskid] |= event;\
-	                                __enable_irq();       \
+	                         __disable_irq();       \
+	                         Event[taskid] |= event;\
+	                          __enable_irq();       \
                                  Preempt(taskid);       \
                                }while(0)
 
@@ -103,17 +103,17 @@ extern const unsigned char TaskVectorNo[], TaskPrioAssigned[];
                            __enable_irq();}while(0)																		
 
 #define InitTasks() do{                                    \
-	                    unsigned char i;                     \
-	                    for(i=MAXTASKS;i>0 ;i--){            \
+	              unsigned char i;                     \
+	              for(i=MAXTASKS;i>0 ;i--){            \
                         Wtimers[i-1]=0;                    \
-									    }                                    \
+		      }                                    \
                     }while(0)
 #define UpdateTimers() do{                                                    \
-	                       unsigned char i;                                     \
-	                       for(i=0;i<MAXTASKS;i++){                             \
-											     if(Wtimers[i]&&Wtimers[i]!=(unsigned short)(-1)) { \
-												     if(!--Wtimers[i]) Preempt(i);                    \
-													 }                                                  \
+	                 unsigned char i;                                     \
+	                 for(i=0;i<MAXTASKS;i++){                             \
+		           if(Wtimers[i]&&Wtimers[i]!=(unsigned short)(-1)) { \
+		             if(!--Wtimers[i]) Preempt(i);                    \
+			   }                                                  \
                          }                                                    \
                        }while(0)
 
@@ -121,39 +121,39 @@ typedef unsigned int Mutex_F;
 
 #define InitMutex(mut) mut=0
 #define WaitMutex(mut,timeout,caseno) _cpn=caseno;                          \
-												      if(CurID<MAXPREEMPTS){                        \
-																__disable_irq();                            \
-	                              mut |= (unsigned int)0x01<<(CurID+1);       \
-																__enable_irq();                             \
-															}                                             \
-									            Wtimers[CurID] = timeout;                     \
-															case caseno:                                  \
-															  if(mut&0x01&&Wtimers[CurID]) return;        \
-  															__disable_irq();                            \
-															  Trigged= !(mut&0x01);                       \
-															  mut |= 0x01;                                \
-															  __enable_irq();                             \
-															  if(!PrioInversion){                         \
-																  __disable_irq();                          \
-															    if(CurID<MAXPREEMPTS){                    \
-																    SetHighestPrio(CurID);                  \
-															      __enable_irq();                         \
-																	}                                         \
-															  }
-#define ReleaseMutex(mut) do{                                         \
+			      if(CurID<MAXPREEMPTS){                        \
+				__disable_irq();                            \
+	                        mut |= (unsigned int)0x01<<(CurID+1);       \
+				__enable_irq();                             \
+			      }                                             \
+			      Wtimers[CurID] = timeout;                     \
+			      case caseno:                                  \
+			        if(mut&0x01&&Wtimers[CurID]) return;        \
+  				__disable_irq();                            \
+			        Trigged= !(mut&0x01);                       \
+			        mut |= 0x01;                                \
+			        __enable_irq();                             \
+			        if(!PrioInversion){                         \
+				  __disable_irq();                          \
+			          if(CurID<MAXPREEMPTS){                    \
+				    SetHighestPrio(CurID);                  \
+			            __enable_irq();                         \
+			          }                                         \
+				 }
+#define ReleaseMutex(mut) do{                                               \
 	                          unsigned char i;                          \
 	                          __disable_irq();                          \
 	                          mut &= ~(unsigned int)0x01<<(CurID+1);    \
 	                          mut &= ~(unsigned int)0x01;               \
 	                          for(i=1; i<(sizeof(mut)*8);i++){          \
-															if(!(mut>>i)) break;                    \
-														  if(mut>>i&0x01) Preempt(i-1);           \
-															if(!PrioInversion){                     \
-													      if(CurID<MAXPREEMPTS)                 \
-															     BackPrio(CurID);                   \
-															}                                       \
-														}                                         \
-														__enable_irq();                           \
+			            if(!(mut>>i)) break;                    \
+				    if(mut>>i&0x01) Preempt(i-1);           \
+				    if(!PrioInversion){                     \
+				      if(CurID<MAXPREEMPTS)                 \
+				         BackPrio(CurID);                   \
+				    }                                       \
+				  }                                         \
+				  __enable_irq();                           \
                           }while(0)																
 
 		
@@ -167,8 +167,8 @@ typedef unsigned int Mutex_F;
  2. In threads, some variables are need to set as "static" to save context, if are not sure of one, just use "static" variable. 
  3. A system ticker is needed, when porting different MCU, just use one timer as system ticker and add "UpdateTimers()" in its
 		interrupt handler.
- 4. WaitTime£¨ticks,caseno) system function, ticks value is in 1¡«0xFFFF.
- 5. WaitEventAnd/Or(c,timeout,caseno)£¬c is event flag, timeout is like ticks above.
+ 4. WaitTimeÂ£Â¨ticks,caseno) system function, ticks value is in 1Â¡Â«0xFFFF.
+ 5. WaitEventAnd/Or(c,timeout,caseno)Â£Â¬c is event flag, timeout is like ticks above.
  6. WaitMutex(mut,timeout,caseno), mut is mutex, an exclusive resource, timeout is same as above
  7. when ticks or timeout is 0xffff, it means to wait forever, no time expire happened.
  8. WaitEventAnd/Or and ClearEvent are used together to clear event used.
