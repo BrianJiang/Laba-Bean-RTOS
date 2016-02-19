@@ -113,8 +113,8 @@ __Vectors       DCD     __initial_sp                   ; Top of Stack
                 DCD     USART1_IRQHandler              ; USART1
                 DCD     USART2_IRQHandler              ; USART2
                 DCD     0
-				DCD     Ptask0
-				DCD     Ptask1
+				DCD     Ptask0         ; Preemptable thread
+				DCD     Ptask1         ; Preemptable thread
 __Vectors_End
 
 __Vectors_Size  EQU  __Vectors_End - __Vectors
@@ -211,7 +211,7 @@ Default_Handler PROC
                 EXPORT  USART1_IRQHandler              [WEAK]
                 EXPORT  USART2_IRQHandler              [WEAK]
                 EXPORT  Ptask0                         [WEAK]
-				EXPORT  Ptask1                         [WEAK]
+		EXPORT  Ptask1                         [WEAK]
 WWDG_IRQHandler
 RTC_IRQHandler
 FLASH_IRQHandler
